@@ -1,2 +1,6 @@
-# lobbysystem
-Ein Minecraft 1.13/1.14 Skript. Es bietet viele Lobby-Funktionen.
+# LobbySystem
+
+Mehr Informationen im Wiki.
+
+Offizieller Download:
+https://www.spigotmc.org/resources/lobbysystem-de.72701/
