@@ -1,0 +1,1387 @@
+#PLUGIN INFOS:
+#Plugin-Version: alpha-1.1.1
+#Autor: sehrschlecht36
+#Commands, die bald kommen: /lobbywrite, /wartung
+#________________________________________________OPTIONS_______________________________________________
+options:
+	KeineRechte: §cDu hast leider keine Berechtigung, diesen Befehl zu nutzen.
+	Prefix: §7[§6%{prefix}%§7]§6
+	StandartPrefix: §7[§6DeinServer§7]§6
+#________________________________________________UPDATE_______________________________________________
+
+on join:
+	if text from "https://pastebin.com/raw/VdvSfnxX" is not "alpha-1.1":
+		loop all players:
+			if loop-player has permission "pm.update.notify":
+				set {__newversion} to text from "https://pastebin.com/raw/KcNASsX1"
+				set {__updates} to text from "https://pastebin.com/raw/1H7cKcPt"
+				send "&e&m--------------------------------------------------" to player
+				send "&a&lEine neue Version von LobbySystem ist verfügbar." to player
+				send "https://forums.skunity.com/resources/lobbysystem-de.893/" to player
+				send "&aNeuigkeiten in der Version &a&l%{__newversion}%:" to player
+				send "%{__updates}%" to player
+				send "&e&m--------------------------------------------------" to player
+				
+command /checkforupdate:
+	permission: pm.update.check
+	permission message: {@KeineRechte}
+	trigger:
+		if text from "https://pastebin.com/raw/VdvSfnxX" is not "alpha-1.1":
+			loop all players:
+				if loop-player has permission "pm.update.notify":
+					set {__newversion} to text from "https://pastebin.com/raw/KcNASsX1"
+					set {__updates} to text from "https://pastebin.com/raw/1H7cKcPt"
+					send "&e&m--------------------------------------------------" to player
+					send "&a&lEine neue Version von LobbySystem ist verfügbar." to player
+					send "https://forums.skunity.com/resources/lobbysystem-de.893/" to player
+					send "&aNeuigkeiten in der Version &a&l%{__newversion}%:" to player
+					send "%{__updates}%" to player
+					send "&e&m--------------------------------------------------" to player
+#________________________________________________LOBBY-SETTINGS_______________________________________________
+on join:
+	if {prefix} is not set:
+		loop all players:
+			if loop-player has permission "pm.update.notify":
+				send "§7[§6%{prefix}%§7]§a§l &4&lAchtung: Es ist kein Prefix gesetzt!" to player
+command /color [<Text>]:
+	permission: pm.lobby.color
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Du kannst folgende Farben auswählen:" to player
+			send "§7[§6%{prefix}%§7]§6 &1Blau&r, &aGrün&r, &4Rot&r, Reset." to player
+		if arg 1 is set:
+			if arg 1 is "Blau":
+				if player has permission "pm.lobby.color.blue":
+					set {%player%.color} to "blue"
+					send "§7[§6%{prefix}%§7]§6 Deine Farbe wurde erfolreich auf &1Blau &6gesetzt." to player
+				else:
+					send "{@KeineRechte}" to player
+			else:
+				if arg 1 is "Grün":
+					if player has permission "pm.lobby.color.green":
+						set {%player%.color} to "green"
+						send "§7[§6%{prefix}%§7]§6 Deine Farbe wurde erfolreich auf &aGrün &6gesetzt." to player
+					else:
+						send "{@KeineRechte}" to player
+				else:
+					if arg 1 is "Rot":
+						if player has permission "pm.lobby.color.red":
+							set {%player%.color} to "red"
+							send "§7[§6%{prefix}%§7]§6 Deine Farbe wurde erfolreich auf &4Rot &6gesetzt." to player
+						else:
+							send "{@KeineRechte}" to player
+					else:
+						if arg 1 is "Reset":
+							delete {%player%.color}
+							send "§7[§6%{prefix}%§7]§6 Deine Farbe wurde erfolreich zurückgesetzt." to player
+						else:
+							send "§7[§6%{prefix}%§7]§6 Diese Farbe existiert nicht." to player
+						
+on command "help":
+	if player don't have permission "pm.command.papercommand":
+		send "{@KeineRechte}" to player
+		cancel event
+		
+on command "pl":
+	if player don't have permission "pm.command.papercommand":
+		send "{@KeineRechte}" to player
+		cancel event
+		
+on command "plugins":
+	if player don't have permission "pm.command.papercommand":
+		send "{@KeineRechte}" to player
+		cancel event
+		
+on command "ver":
+	if player don't have permission "pm.command.papercommand":
+		send "{@KeineRechte}" to player
+		cancel event
+
+on command "version":
+	if player don't have permission "pm.command.papercommand":
+		send "{@KeineRechte}" to player
+		cancel event
+on command "?":
+	if player don't have permission "pm.command.papercommand":
+		send "{@KeineRechte}" to player
+		cancel event
+
+on chat:
+	if {%player%.reply} is not set:
+		if {%player%.lastmessage} contains chat message:
+			cancel event
+			send "§7[§6%{prefix}%§7]§6 Bitte spamme nicht." to player
+		else:
+			set {%player%.lastmessage} to chat message
+			if player has permission "pm.lobby.chat":
+				cancel event
+				if {%player%.color} is set:
+					if {%player%.color} is "blue":
+						broadcast "&a%player% &7>> &r&1%chat-message%"
+					if {%player%.color} is "red":
+						broadcast "&a%player% &7>> &r&4%chat-message%"
+					if {%player%.color} is "green":
+						broadcast "&a%player% &7>> &r&a%chat-message%"
+				else:
+					broadcast "&a%player% &7>> &r%chat-message%"
+			else:
+				cancel event
+				send "§7[§6%{prefix}%§7]§6 Du kannst in der Lobby nicht schreiben." to player
+#________________________________________________SPAWN_______________________________________________
+command /setspawn:
+	permission: pm.spawn.set
+	permission message: {@KeineRechte}
+	trigger:
+		set {spawn} to the player's location
+		send "§7[§6%{prefix}%§7]§6 Der Spawn wurde erfolreich auf &a%{spawn}% &6gesetzt." to player
+		
+command /spawn [<Player>]:
+	permission: pm.spawn.tp
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			teleport player to {spawn}
+			send "§7[§6%{prefix}%§7]§6 Du wurdest erfolreich zum Spawn teleportiert." to player
+		else:
+			if player has permission "pm.spawn.tp.others":
+				teleport arg 1 to {spawn}
+				send "§7[§6%{prefix}%§7]§6 &a%arg 1% &6wurde erfolreich zum Spawn teleportiert." to player
+				send "§7[§6%{prefix}%§7]§6 Du wurdest erfolreich zum Spawn teleportiert." to arg 1
+				
+on join:
+	teleport player to {spawn}
+	
+#________________________________________________GUI_______________________________________________
+command /getgui:
+	permission: pm.gui.teleporter.get
+	permission message: {@KeineRechte}
+	trigger:
+		add 1 compass named "&aTeleporter" to player's inventory
+
+on join:
+	if player has permission "pm.gui.teleporter.get":
+		if player's inventory contains 1 compass:
+			remove all compass from the player's inventory
+			add 1 compass named "&aTeleporter" to player's inventory
+ 
+on inventory click:
+	if name of event-inventory = "&aTeleporter":
+		event-slot = barrier
+		index of event-slot = 8
+		cancel event
+		event-click type = left mouse button
+		if player has permission "pm.gui.teleporter.leave":
+			kick player due to "&aDu hast den Server verlassen."
+		else:
+			send "&cDu hast leider keine Berechtigung, diese Funktion des Teleporters zu nutzen." to player
+	if name of event-inventory = "&aTeleporter":
+		event-slot = diamond sword
+		index of event-slot = 6
+		cancel event
+		event-click type = left mouse button
+		if player has permission "pm.gui.teleporter.pvp":
+			teleport player to {Warp.PvP}
+		else:
+			send "&cDu hast leider keine Berechtigung, diese Funktion des Teleporters zu nutzen." to player
+	if name of event-inventory = "&aTeleporter":
+		event-slot = red bed
+		index of event-slot = 4
+		cancel event
+		event-click type = left mouse button
+		if player has permission "pm.gui.teleporter.bedwars":
+			teleport player to {Warp.Bedwars}
+		else:
+			send "&cDu hast leider keine Berechtigung, diese Funktion des Teleporters zu nutzen." to player
+	if name of event-inventory = "&aTeleporter":
+		event-slot = grass block
+		index of event-slot = 2
+		cancel event
+		event-click type = left mouse button
+		if player has permission "pm.gui.teleporter.skywars":
+			teleport player to {Warp.Skywars}
+		else:
+			send "&cDu hast leider keine Berechtigung, diese Funktion des Teleporters zu nutzen." to player
+on right click:
+	if player has permission "pm.gui.teleporter.use":
+		if item type is compass:
+			if name of item is "&aTeleporter":
+				open chest inventory with 1 rows named "&aTeleporter" to player
+				set slot 4 of player's current inventory to red bed named "&aBedwars"
+				set slot 2 of player's current inventory to grass block named "&aSkywars"
+				set slot 6 of player's current inventory to diamond sword named "&aPvP"
+				set slot 8 of player's current inventory to barrier named "&4Server verlassen"
+	else:
+		send "&cDu hast leider keine Berechtigung, den Teleporter zu nutzen" to player
+		
+#________________________________________________ANTICHEAT_______________________________________________
+command /ac [<Text>]:
+	permission: pm.ac.cmd
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Du kannst zwischen an und aus wählen."
+			send "§7[§6%{prefix}%§7]§6 Die aktuelle Einstellung ist &a%{ac}%" to player
+			stop trigger
+		else:
+			if arg 1 is "an":
+				set {ac} to "true"
+				send "§7[§6%{prefix}%§7]§6 Das AntiCheat wurde erfolgreich aktiviert." to player
+			else:
+				if arg 1 is "aus":
+					set {ac} to "false"
+					send "§7[§6%{prefix}%§7]§6 Das AntiCheat wurde erfolreich deaktiviert." to player
+				else:
+					send "§7[§6%{prefix}%§7]§6 Bitte schreibe an oder aus." to player
+on leftclick:
+	if {ac} is "true":
+		add 1 to {click.%player%}
+		if player has permission "pm.ac.trust":
+		else:
+			if {click.%player%} >= 17:
+				kick the player due to "&4ANTICHEAT&7 >> &cAutoclick"
+				add 1 to {%player%.ac.autoclick}
+				if {%player%.ac.autoclick} is more than 5:
+					ban player due to "&4ANTICHEAT&7 >> &cAutoclick"
+					clear {%player%.ac.autoclick}
+every 1 seconds:
+	loop all players:
+		clear {click.%loop-player%}
+
+every 60 seconds:
+	if {ac} is "true":
+		loop all players:
+			clear {%loop-player%.ac.autoarmor}
+every 1 seconds:
+	if {ac} is "true":
+		loop all players:
+			if loop-player is in world "World":
+				add 1 diamond chestplate named "§4§lAC" to slot a random integer between 10 and 26 of the loop-player's inventory
+				wait 0.1 seconds
+				remove all diamond chestplate named "§4§lAC" from the loop-player's inventory
+	
+on inventory click:
+	if {ac} is "true":
+		if event-item is diamond chestplate:
+			if name of event-item is "§4§lAC":
+				cancel event
+				add 1 to {%player%.ac.autoarmor}
+				if {%player%.ac.autoarmor} is more than 10:
+					kick player due to "&4ANTICHEAT&7 >> &cAutoclick"
+					ban player due to "&4ANTICHEAT&7 >> &cAutoclick"
+					clear {%player%.ac.autoarmor}
+
+command /clearaa:
+	permission: pm.ac.aa.clear
+	trigger:
+		clear {%player%.ac.autoarmor}
+		stop trigger
+
+#________________________________________________SCOREBOARD_______________________________________________
+every 2 seconds:
+	loop all players:
+		wipe loop-player's sidebar
+		set name of sidebar of loop-player to "§7[§6%{prefix}%§7]§6"
+		set score "&a" in sidebar of loop-player to 10
+		set score "&6Server: &aLobby" in sidebar of loop-player to 9
+		set score "&1" in sidebar of loop-player to 8
+		set score "&6Shop: &ashop.deinserver.de" in sidebar of loop-player to 7
+		set score "&7" in sidebar of loop-player to 6
+		set score "&6Forum: &aforum.deinserver.de" in sidebar of loop-player to 5
+		set score "&a" in sidebar of loop-player to 4
+		set score "&6TeamSpeak³: &ats.deinserver.de" in sidebar of loop-player to 3
+		set score "&2" in sidebar of loop-player to 2
+		set score "&6Dein Kontostand: &a%{money.%loop-player's uuid%}%&a$" in sidebar of loop-player to 1
+		set score "&r" in sidebar of loop-player to 10
+		if ping of loop-player is 0:
+			set score "&6Dein Ping: &aNicht verfügbar" in sidebar of loop-player to 11
+		else:
+			set score "&6Dein Ping: &a%ping of loop-player%" in sidebar of loop-player to 11
+		
+#________________________________________________REPORT_______________________________________________
+command /report [<Player>] [<Text>]:
+	permission: pm.report.report
+	permission message: {@KeineRechte}
+	trigger:
+		send "§7[§6%{prefix}%§7]§6 Bitte warten..." to player
+		loop 100 times:
+			if {%arg 1%.report.%loop-number%} is not set:
+				set {%arg 1%.report.%loop-number%} to arg 2
+				send "§7[§6%{prefix}%§7]§6 Dein Report wurde erfolgreich versandt. Wir halten dich auf dem Laufenden." to player
+				set {%arg 1%.reportplayer.%loop-number%} to player
+				stop trigger
+				
+command /lreport [<Player>]:
+	permission: pm.report.list
+	permission message: {@KeineRechte}
+	trigger:
+		send "§7[§6%{prefix}%§7]§6 --Beginn der Liste--" to player
+		loop 100 times:
+			if {%arg 1%.report.%loop-number%} is not set:
+				send "§7[§6%{prefix}%§7]§6 --Ende der Liste--" to player
+				stop trigger
+			else:
+				send "§7[§6%{prefix}%§7]§6 Spieler: &a%arg 1% &7| &6Nummer: &a%loop-number% &7| &6Grund: &a%{%arg 1%.report.%loop-number%}%" to player
+			
+command /creport [<Player>]:
+	permission: pm.report.clear
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is set:
+			send "§7[§6%{prefix}%§7]§6 --Beginn der Liste--" to player
+			loop 100 times:
+				if {%arg 1%.report.%loop-number%} is not set:
+					send "§7[§6%{prefix}%§7]§6 --Fertig--" to player
+					stop trigger
+				else:
+					delete {%arg 1%.report.%loop-number%}	
+		else:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib einen Spieler an." to player
+			
+command /viewcase [<Player>] [<Integer>]:
+	permission: pm.case.moderator
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib einen Spieler an." to player
+		else:
+			if arg 2 is not set:
+				send "§7[§6%{prefix}%§7]§6 Bitte gib einen Fall an." to player
+			else:
+				if {%arg 1%.report.%arg 2%} is not set:
+					send "§7[§6%{prefix}%§7]§6 Dieser Fall existiert nicht." to player
+				else:
+					send "§7[§6%{prefix}%§7]§6 Informationen zu Fall &a%arg 2%:" to player
+					send "§7[§6%{prefix}%§7]§6 Grund der Meldung: &a%{%arg 1%.report.%arg 2%}%" to player
+					send "§7[§6%{prefix}%§7]§6 Meldung kommt von: &a%{%arg 1%.reportplayer.%arg 2%}%" to player
+					send "§7[§6%{prefix}%§7]§6 Dein Report wird bearbeitet." to {%arg 1%.reportplayer.%arg 2%}
+					
+					
+command /editcase [<offline player>] [<Integer>] [<Text>] [<Text>]:
+	permission: pm.case.moderator
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib einen Spieler an." to player
+		else:
+			if arg 2 is not set:
+				send "§7[§6%{prefix}%§7]§6 Bitte gib einen Fall an." to player
+			else:
+				if {%arg 1%.report.%arg 2%} is set:
+					if arg 3 is not set:
+						send "§7[§6%{prefix}%§7]§6 Du kannst folgendes tun: ban, pardon, mute." to player
+					else:
+						if arg 3 is "ban":
+							if arg 4 is not set:
+								send "§7[§6%{prefix}%§7]§6 Du kannst den Spieler bannen. Bitte gib eine Grund an." to player
+							else:
+								execute command "/minecraft:ban %arg 1% %arg 4%"
+								send "§7[§6%{prefix}%§7]§6 Der Spieler %arg 1% &6wurde erfolreich wegen %arg 4% &6gebannt." to player
+								delete {%arg 1%.report.%arg 2%}
+								delete {%arg 2%.reportplayer.%arg 2%}
+						if arg 3 is "pardon":
+							if arg 4 is not set:
+								send "§7[§6%{prefix}%§7]§6 Du kannst den Spieler freischalten. Bitte gib einen Grund an." to player
+							else:
+								send "§7[§6%{prefix}%§7]§6 Der Spieler wird wegen %arg 4% freigeschaltet." to player
+						if arg 3 is "mute":
+							if arg 4 is not set:
+								send "§7[§6%{prefix}%§7]§6 Du kannst den Spieler stummschalten. Bitte gib einen Grund an." to player
+							else:
+								execute command "/mute %arg 1% 100000"
+								send "§7[§6%{prefix}%§7]§6 Der Spieler %arg 1% wurde erfolreich wegen %arg 4% stumm gestellt." to player
+								
+#________________________________________________WARP_______________________________________________
+command /setwarp [<Text>] [<Text>]:
+	permission: pm.setwarp
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is set:
+			if arg 2 is set:
+				set {Warp.%arg 1%.permission} to arg 2
+				set {Warp.%arg 1%} to player's location
+				send "§7[§6%{prefix}%§7]§6 Warp gesetzt!" to player
+				send "§7[§6%{prefix}%§7]§6 Permission gesetzt!" to player
+				stop trigger
+			else:
+				send "§7[§6%{prefix}%§7]§6 Warp gesetzt!" to player
+				set {Warp.%arg 1%} to player's location
+				add arg 1 to {Warps::*}
+				stop trigger
+		else:
+			send "{@Prefix} Du musst einen Namen wählen!" to player
+			stop trigger
+			
+command /warp [<Text>]:
+	permission: pm.warp
+	trigger:
+		if arg 1 is set:
+			if {Warp.%arg 1%} is set:
+				if {Warp.%arg 1%.permission} is set:
+					if player has permission "%{Warp.%arg 1%.permission}%":
+						teleport player to {Warp.%arg 1%}
+						send "{@Prefix} Teleportiert...!" to player
+						stop trigger
+					else:
+						send "{@KeineRechte}" to player
+						stop trigger
+				else:
+					teleport player to {Warp.%arg 1%}
+					send "{@Prefix} Teleportiert...!" to player
+					stop trigger
+			else:
+				send "{@Prefix} Warp existiert nicht!" to player
+				stop trigger
+		else:	
+			send "{@Prefix} Warps: &a%{Warps::*}%" to player
+			stop trigger
+			
+command /delwarp [<Text>]:
+	permission: pm.delwarp
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is set:
+			if {Warp.%arg 1%} is set:
+				delete {Warp.%arg 1%.permission}
+				if {Warp.%arg 1%.permission} is set:
+				delete {Warp.%arg 1%}
+				remove arg 1 from {Warps::*}
+				send "{@Prefix} Warp gelöscht!" to player
+				stop trigger
+			else:
+				send "{@Prefix} Dieser Warp existiert nicht!" to player
+				stop trigger 
+		else:
+			send "{@Prefix} Du musst einen Namen wählen!" to player
+			stop trigger
+			
+#________________________________________________STATS_______________________________________________
+on join:
+	if {kills.%player%} is not set:
+		set {kills.%player%} to 0
+	if {tode.%player%} is not set:
+		set {tode.%player%} to 0
+
+
+command /stats:
+	permission: pm.stats.view
+	permission message: {@KeineRechte}
+	trigger:
+		send "{@Prefix} Kills: %{kills.%player%}%" to player
+		send "{@Prefix} Tode: %{tode.%player%}%" to player
+		send "{@Prefix} K/D: %({kills.%player%}/{tode.%player%})%" to player
+		stop trigger
+		
+on death:
+	add 1 to {tode.%player%}
+	add 1 to {kills.%attacker%}
+
+command /resetstats [<Text>]:
+	aliases: /rstats, /statsreset
+	trigger:
+		if arg 1 is not set:
+			if player has permission "pm.stats.reset.own":
+				send "{@Prefix} Deine Stats werden zurückgesetzt, wenn du innerhalb der nächsten 60 Sekunden /resetstats confirm eingibts." to player
+				set {sreset.%player%} to true
+				wait 60 seconds
+				delete {sreset.%player%}
+			else:
+				send "{@KeineRechte}" to player
+		if arg 1 is set:
+			if arg 1 is "confirm":
+				if {sreset.%player%} is set:
+					if {sreset.%player%} is true:
+						if player has permission "pm.stats.reset.own":
+							delete {kills.%player%}
+							delete {tode.%player%}
+							delete {sreset.%player%}
+							send "{@Prefix} Deine Stats wurden erfolgreich zurückgesetzt." to player
+				else:
+					send "{@Prefix} Du kannst diesen Befehl nicht nutzen, da es nichts zu bestätigen gibt." to player
+			if arg 1 is not "confirm":
+				if player has permission "pm.stats.reset.other":
+					delete {kills.%arg 1%}
+					delete {tode.%arg 1%}
+					send "{@Prefix} Die Stats von &a%arg 1% &6wurden erfolgreich zurückgesetzt." to player 
+
+#________________________________________________SPEED_______________________________________________
+command /walkspeed [<Integer>]:
+	permission: pm.speed.walk
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is set:
+			if arg 1 is 1:
+				set the player's walk speed to 0.2
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 2:
+				set the player's walk speed to 0.3
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 3:
+				set the player's walk speed to 0.4
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 4:
+				set the player's walk speed to 0.5
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 5:
+				set the player's walk speed to 0.6
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 6:
+				set the player's walk speed to 0.7
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 7:
+				set the player's walk speed to 0.8
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 8:
+				set the player's walk speed to 0.9
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 9:
+				set the player's walk speed to 1
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 10:
+				set the player's walk speed to 1.1
+				send "{@Prefix} Deine Geschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+		else:
+			send "{@Prefix} Du kannst zwischen den Geschwindigkeiten 1-10 wählen." to player
+			stop trigger
+		stop trigger
+			
+command /resetspeed:
+	permission: pm.speed.resetspeed
+	permission message: {@KeineRechte}
+	trigger:
+		set the player's walk speed to 0.2
+		set the player's fly speed to 0.1
+		send "{@Prefix} Deine Geschwindigkeit wurde zurückgesetzt." to player
+		
+command /flyspeed [<Integer>]:
+	permission: pm.speed.fly
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is set:
+			if arg 1 is 1:
+				set the player's fly speed to 0.1
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 2:
+				set the player's fly speed to 0.2
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 3:
+				set the player's fly speed to 0.3
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 4:
+				set the player's fly speed to 0.4
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 5:
+				set the player's fly speed to 0.5
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 6:
+				set the player's fly speed to 0.6
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 7:
+				set the player's fly speed to 0.7
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 8:
+				set the player's fly speed to 0.8
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 9:
+				set the player's fly speed to 0.9
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+			if arg 1 is 10:
+				set the player's fly speed to 1
+				send "{@Prefix} Deine Fluggeschwindigkeit wurde auf &a%arg 1% &6gesetzt." to player
+				stop trigger
+		else:
+			send "{@Prefix} Du kannst zwischen den Geschwindigkeiten 1-10 wählen." to player
+			stop trigger
+		stop trigger
+		
+#________________________________________________MUTE_______________________________________________
+every 1 minute:
+	add 1 to {time}
+	wait 5 ticks
+	loop all players:
+		if {mute.%loop-player's uuid%} is less than or equal to {time}:
+			delete {mute.%loop-player's uuid%}
+			send "§7[§6%{prefix}%§7]§6 Mute aufgehoben!" to loop-player
+
+
+command /mute [<Player>] [<Integer>]:
+	permission: pm.mute.mute
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 /mute [Spieler] [Zeit]" to player
+			stop trigger
+		loop all players:
+			if arg 1 is loop-player:
+				if arg 2 is set:
+					send "§7[§6%{prefix}%§7]§6 Du wurdest für %arg 2% Minuten stumm gestellt!" to loop-player
+					send "§7[§6%{prefix}%§7]§6 Du hast &a%arg 1% &6für &a%arg 2% &6Minuten stumm gestellt!" to player
+					set {mute.%loop-player's uuid%} to ({time}+arg 2)
+					stop trigger
+					
+					
+					
+on join:
+	if {mute.%player's uuid%} is set:
+		if {mute.%player's uuid%} is less than or equal to {time}:
+			delete {mute.%player's uuid%}
+			send "§7[§6%{prefix}%§7]§6 Mute aufgehoben!" to player
+			stop trigger
+				
+				
+on chat:
+	if {mute.%player's uuid%} is set:
+		cancel event
+		send "§7[§6%{prefix}%§7]§6 Du bist stumm gestellt!" to player
+		
+command /unmute [<Player>]:
+	permission: pm.mute.unmute
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Du musst einen Spieler angeben." to player
+			stop trigger
+		else:
+			loop all players:
+				if arg 1 is loop-player:
+					if {mute.%loop-player's uuid%} is set:
+						delete {mute.%loop-player's uuid%}
+						send "§7[§6%{prefix}%§7]§6 &a%arg 1% &6wurde erfolreich entmuted." to player
+						send "§7[§6%{prefix}%§7]§6 Du wurdest erfolreich von &a%player% &6entmuted." to loop-player
+						stop trigger
+					else:
+						send "§7[§6%{prefix}%§7]§6 Dieser Spieler ist nicht gemuted!" to player
+						stop trigger
+						
+#________________________________________________MC-CMD_______________________________________________
+command /op:
+	permission: pm.op
+	permission message: {@KeineRechte}
+	trigger:
+		send "§7[§6%{prefix}%§7]§6 Dieser Befehl ist noch nicht verfügbar." to player
+		stop trigger
+		
+command /deop:
+	permission: pm.deop
+	permission message: {@KeineRechte}
+	trigger:
+		send "§7[§6%{prefix}%§7]§6 Dieser Befehl ist noch nicht verfügbar." to player
+		stop trigger
+		
+command /gamemode [<Text>]:
+	aliases: /gm, /spielmodus
+	trigger:
+		if arg 1 is "survival":
+			if player has permission "pm.gm.0":
+				set player's gamemode to survival
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Überleben gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "0":
+			if player has permission "pm.gm.0":
+				set player's gamemode to survival
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Überleben gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "s":
+			if player has permission "pm.gm.0":
+				set player's gamemode to survival
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Überleben gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "creative":
+			if player has permission "pm.gm.1":
+				set player's gamemode to creative
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Kreativ gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "1":
+			if player has permission "pm.gm.1":
+				set player's gamemode to creative
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Kreativ gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "c":
+			if player has permission "pm.gm.1":
+				set player's gamemode to creative
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Kreativ gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "spectator":
+			if player has permission "pm.gm.3":
+				set player's gamemode to spectator
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Zuschauer gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "3":
+			if player has permission "pm.gm.3":
+				set player's gamemode to spectator
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Zuschauer gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "sp":
+			if player has permission "pm.gm.3":
+				set player's gamemode to spectator
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Zuschauer gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+			#Adventure-Mode nur optional
+		if arg 1 is "adventure":
+			if player has permission "pm.gm.2":
+				set player's gamemode to adventure
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Abenteuer gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "2":
+			if player has permission "pm.gm.2":
+				set player's gamemode to adventure
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Abenteuer gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+		if arg 1 is "a":
+			if player has permission "pm.gm.2":
+				set player's gamemode to adventure
+				send "§7[§6%{prefix}%§7]§6 Dein Spielmodus wurde auf Abenteuer gesetzt." to player
+				stop trigger
+			else:
+				send "&cDu hast leider keine Berechtigung, diesen Befehl zu nutzen" to player
+				
+#________________________________________________JOIN_______________________________________________
+command /joinmessage [<Text>]:
+	permission: pm.joinmessage.command
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib an, ob du die Join-Nachrichten aktivieren oder deaktivieren möchtest." to player
+		else:
+			if arg 1 is "true":
+				set {joinmessage} to "true"
+			else:
+				if arg 1 is "false":
+					set {joinmessage} to "false"
+				else:
+					send "§7[§6%{prefix}%§7]§6 Bitte gib &atrue &6oder &afalse &6an." to player
+					stop trigger
+on quit:
+	if {%player%.banned} is not set:
+		if {joinmessage} is "true":
+			broadcast "§7[§6%{prefix}%§7]§6 &7[&4-&7] %player%"
+		
+on join:
+	if {%player%.banned} is not set:
+		if {joinmessage} is "true":
+			broadcast "§7[§6%{prefix}%§7]§6 &7[&a+&7] %player%"
+	
+	
+on kick:
+	if {%player%.banned} is not set:
+		if {joinmessage} is "true":
+			broadcast "§7[§6%{prefix}%§7]§6 &7[&4-&7] %player%"
+
+#________________________________________________INFO_______________________________________________
+on join:
+	if player has permission "op":
+		if {PMCore} is not set:
+			send "&aHallo, um Fehler zu vermeiden, empfehle ich dir, PMCore zu installieren. Dies findest du bald online auf SpigotMc.org!" to player
+
+options:
+	Prefix: §7[§6Information§7]
+command /information:
+	aliases: /info
+	permission: pm.info.show
+	trigger:
+		send "§7[§6%{prefix}%§7]§6 Instagram: &a%{info.instagram}%" to player
+		send "§7[§6%{prefix}%§7]§6 Twitter: &a%{info.twitter}%" to player
+		send "§7[§6%{prefix}%§7]§6 Website: &a%{info.website}%" to player
+		send "§7[§6%{prefix}%§7]§6 Forum: &a%{info.forum}%" to player
+		send "§7[§6%{prefix}%§7]§6 Shop: &a%{info.shop}%" to player
+		stop trigger
+
+command /setinformation [<Text>] [<Text>]:
+	aliases: /setinfo
+	permission: pm.info.set
+	trigger:
+		if arg 1 is set:
+			if arg 2 is set:
+				set {info.%arg 1%} to arg 2
+				send "§7[§6%{prefix}%§7]§6 Die Information &a%arg 1% &rwurde erfolgreich auf &a%arg 2% &rgesetzt." to player
+				stop trigger
+			else:
+				send "§7[§6%{prefix}%§7]§6 Bitte gebe einen Benutzernamen/Link an."
+			
+		else:
+			send "§7[§6%{prefix}%§7]§6 Es gibt folgende Informationen: &aInstagram, Twitter, Website, Forum, Shop."
+			stop trigger
+		stop trigger
+			
+command /delinfo [<Text>]:
+	permission: pm.info.delete
+	trigger:
+		if arg 1 is set:
+			if {info.%arg 1%} is set:
+				delete {info.%arg 1%}
+				send "§7[§6%{prefix}%§7]§6 Die Information &a%arg 1% &rwurde erfolgreich gelöscht." to player
+				stop trigger
+			else:
+				send "§7[§6%{prefix}%§7]§6 Die Information &a%arg 1% &rist nicht vorhanden." to player
+				stop trigger
+			stop trigger
+		else:
+			send "§7[§6%{prefix}%§7]§6 Es gibt folgende Informationen: &aInstagram, Twitter, Website, Forum, Shop."
+			stop trigger
+		stop trigger
+		
+#________________________________________________HOME_______________________________________________
+command /sethome [<Text>]:
+	trigger:
+		if arg 1 is set:
+			set {home.%player%.%arg 1%} to player's location
+			add arg 1 to {homes.%player%::*}
+			send "§7[§6%{prefix}%§7]§6 Zuhause gesetzt!" to player
+			stop trigger
+		else:
+			send "§7[§6%{prefix}%§7]§6 Du musst einen Namen angeben" to player
+			stop trigger
+		
+command /home [<Text>]:
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 %{homes.%player%::*}%" to player
+			stop trigger
+		else:
+			if {home.%player%.%arg 1%} is set:
+				teleport player to {home.%player%.%arg 1%}
+				send "§7[§6%{prefix}%§7]§6 Zuhause angekommen!" to player
+				stop trigger
+			else:
+				send "§7[§6%{prefix}%§7]§6 Dieser HomePunkt existiert nicht!" to player
+				stop trigger
+		
+command /delhome [<Text>]:
+	trigger:
+		if {home.%player%.%arg 1%} is set:
+			delete {home.%player%.%arg 1%}
+			remove arg 1 from {home.%player%::*}
+			send "§7[§6%{prefix}%§7]§6 Zuhause gelöscht!" to player
+			stop trigger
+		else:
+			send "§7[§6%{prefix}%§7]§6 Dieser HomePunkt existiert nicht!" to player
+			stop trigger
+			
+#________________________________________________FAKEMAXPLAYER_______________________________________________
+on server list ping:
+	set the fake max players count to 10000
+	
+#________________________________________________ESSEN_______________________________________________
+on rightclick holding a sugar:
+	if name of player's tool is "&6Zucker":
+		set {_Food} to player's food level
+		add 2 to {_Food}
+		if {_Food} is more than 20:
+			set {_Food} to 20
+		set player's food level to {_Food}
+		remove 1 sugar named "&6Zucker" from player's inventory
+		execute command "/effect give %player% minecraft:speed 10 2"
+        
+command /givefood:
+	permission: pm.essen.give
+	permission message: {@KeineRechte}
+	trigger:
+		add 1 sugar named "&6Zucker" to player's inventory
+		send "§7[§6%{prefix}%§7]§6 Essen gegeben!" to player
+		stop trigger
+		
+#________________________________________________EMSG_______________________________________________
+command /emsgon:
+	permission: pm.emsg.on
+	permission message: {@KeineRechte}
+	trigger:
+		set {%player%.emsg} to true
+		send "§7[§6%{prefix}%§7]§6 EMSG wurde aktiviert." to player
+		stop trigger
+command /emsgoff:
+	permission: pm.emsg.off
+	permission message: {@KeineRechte}
+	trigger:
+		set {%player%.emsg} to false
+		send "§7[§6%{prefix}%§7]§6 EMSG wurde deaktiviert." to player
+		stop trigger
+on join:
+	set {%player%.emsg} to false
+	if player has permission "pm.emsg.join":
+		send "§7[§6%{prefix}%§7]§6 EMSG ist nun deaktiviert. Gebe /emsgon ein, um es zu aktivieren." to player
+	else:
+	
+
+on teleport:
+	if {%player%.emsg} is true:
+		send "§7[§6%{prefix}%§7]§6 Du wurdest teleportiert." to player
+
+on bed enter:
+	if {%player%.emsg} is true:
+		send "§7[§6%{prefix}%§7]§6 Du hast dich in ein Bett gelegt." to player
+	
+on bed leave:
+	if {%player%.emsg} is true:
+		send "§7[§6%{prefix}%§7]§6 Du hast das Bett verlassen." to player
+	
+on block damage: 
+	if {%player%.emsg} is true:
+		send "§7[§6%{prefix}%§7]§6 Du hast einen Block abgebaut!" to player
+on book edit:
+	send "{@Prefix} Du hast ein Buch bearbeitet." to player
+on book sign:
+	if {%player%.emsg} is true:
+		send "§7[§6%{prefix}%§7]§6 Du hast ein Buch signiert." to player
+on bucket empty:
+	if {%player%.emsg} is true:
+		send "§7[§6%{prefix}%§7]§6 Du hast einen Eimer ausgeleert." to player
+on bucket fill:
+	if {%player%.emsg} is true:
+		send "§7[§6%{prefix}%§7]§6 Du hast einen Eimer gefüllt." to player
+		
+#________________________________________________DEOP_______________________________________________
+
+command /quickdeop:
+	permission: pm.quickdeop
+	trigger:
+		deop player
+		send "§7[§6%{prefix}%§7]§6 Deine OP-Rechte wurden entfernt."
+		wait 10 seconds
+		send "§7[§6%{prefix}%§7]§6 Deine OP-Rechte sind wieder da."
+		op player
+		stop trigger
+
+#________________________________________________CPS_______________________________________________
+
+command /cpstest:
+	aliases: /cps, /clicktest
+	permission: pm.cps.run
+	trigger:
+		send "§7[§6%{prefix}%§7]§6 Start in 3 Sekunden!" to player
+		wait 1 second
+		send "§7[§6%{prefix}%§7]§6 Start in 2 Sekunden!" to player
+		wait 1 second
+		send "§7[§6%{prefix}%§7]§6 Start in 1 Sekunde!" to player
+		wait 1 second
+		set {cps.%player%} to 0
+		send "§7[§6%{prefix}%§7]§6 GOOOOOOO!" to player
+		wait 5 seconds
+		set {cps.%player%} to ({cps.%player%} / 5)
+		send "§7[§6%{prefix}%§7]§6 Fertig! Du hattest &a%{cps.%player%}% &6Klicks/Sekunde!" to player
+		
+
+on click:
+	add 1 to {cps.%player%}
+
+#________________________________________________COINFLIP_______________________________________________
+
+command /coinflip:
+	aliases: /coin
+	permission: pm.coinflip
+	permission message: {@KeineRechte}
+	trigger:
+		set {_random} to a random integer between 1 and 2
+		if {_random} is 1:
+			send "§7[§6%{prefix}%§7]§6 Kopf" to player
+			stop trigger
+		if {_random} is 2:
+			send "§7[§6%{prefix}%§7]§6 Zahl" to player
+			stop trigger
+
+command /würfel:
+	permission: pm.wuerfel
+	permission message: {@KeineRechte}
+	trigger:
+		set {_random} to a random integer between 1 and 6
+		send "§7[§6%{prefix}%§7]§6 Deine Zahl: &e%{_random}%" to player
+		stop trigger
+		
+#________________________________________________BROADCAST_______________________________________________
+
+command /broadcast [<Text>]:
+	aliases: /bc, /rundruf
+	permission: pm.bc
+	permission message: {@KeineRechte}
+	trigger:
+		broadcast "§7[§6%{prefix}%§7]§a§l %arg 1%"
+		stop trigger
+		
+#________________________________________________AUTOMUTE_______________________________________________
+
+every 10 ticks:
+	loop all players:
+		if {verwarnung.%loop-player's uuid%} is more than 4:
+			set {mute.%loop-player's uuid%} to ({time}+1)
+			send "§7[§6%{prefix}%§7]§6 Du wurdest für 1 Minute gemutet!" to loop-player
+			set {verwarnung.%loop-player's uuid%} to 0
+			stop trigger
+
+	
+
+on chat:
+	if message contains "Arsch":
+		send "§7[§6%{prefix}%§7]§6 Keine Beleidigung!" to player
+		add 1 to {verwarnung.%player's uuid%}
+		send "§7[§6%{prefix}%§7]§6 Dies ist deine &a%{verwarnung.%player's uuid%}%&a. &6Verwarnung" to player
+		cancel event
+		stop trigger
+	if message contains "Hure":
+		send "§7[§6%{prefix}%§7]§6 Keine Beleidigung!" to player
+		add 1 to {verwarnung.%player's uuid%}
+		send "§7[§6%{prefix}%§7]§6 Dies ist deine &a%{verwarnung.%player's uuid%}%&a. &6Verwarnung" to player
+		cancel event
+		stop trigger
+	if message contains "Scheiß":
+		send "§7[§6%{prefix}%§7]§6 Keine Beleidigung!" to player
+		add 1 to {verwarnung.%player's uuid%}
+		send "§7[§6%{prefix}%§7]§6 Dies ist deine &a%{verwarnung.%player's uuid%}%&a. &6Verwarnung" to player
+		cancel event
+		stop trigger
+	if message contains "Penis":
+		send "§7[§6%{prefix}%§7]§6 Keine Beleidigung!" to player
+		add 1 to {verwarnung.%player's uuid%}
+		send "§7[§6%{prefix}%§7]§6 Dies ist deine &a%{verwarnung.%player's uuid%}%&a. &6Verwarnung" to player
+		cancel event
+		stop trigger
+		
+#________________________________________________PMCORE_______________________________________________
+
+on join:
+	set {PMCore} to true
+
+command /setprefix [<Text>]:
+	aliases: /setcustomprefix
+	trigger:
+		if player has permission "pm.prefix.set":
+			if arg 1 is set:
+				set {prefix} to arg 1
+				send "&6Der Prefix wurde erfolgreich auf §7[§6%{prefix}%§7]§6 gesetzt." to player
+				stop trigger
+			else:	
+				send "&6Bitte gib einen Prefix an" to player
+				stop trigger
+		else:
+			send "{@KeineRechte}" to player
+			stop trigger
+	
+	
+command /testprefix:
+	aliases: /prefix, /serverprefix, /getprefix, /customprefix
+	trigger:
+		if player has permission "pm.prefix.test":
+			send "&6Der aktuelle Prefix ist: §7[§6%{prefix}%§7]§6. Das hier ist ein Text." to player
+			stop trigger
+		else:
+			send "{@KeineRechte}" to player
+			stop trigger
+			
+			
+command /resetprefix:
+	aliases: /rprefix, /resetcustomprefix
+	trigger:
+		if player has permission "pm.prefix.reset":
+			set {prefix} to "DeinServer"
+			send "&6Der Prefix wurde erfolgreich auf {@StandartPrefix} &6zurückgesetzt." to player
+			stop trigger
+		else:
+			send "{@KeineRechte}" to player
+			stop trigger
+
+#________________________________________________ITEMSPAWNER_______________________________________________
+
+command /setupspawner [<Text>] [<Integer>]:
+	trigger:
+		if arg 1 is "Bronze" or "Eisen" or "Gold":
+			if arg 2 is set:
+				if {spawner.%arg 1%::*} contains position of block under player:
+					remove position of block under player from {spawner.%arg 1%::*}
+					send "§7[§6%{prefix}%§7]§6 Spawner &a%arg 1% &6entfernt!" to player
+				else:
+					add position of block under player to {spawner.%arg 1%::*}
+					send "§7[§6%{prefix}%§7]§6 Spawner &a%arg 1% &6gesetzt!" to player
+					stop trigger
+		else:
+			send "§7[§6%{prefix}%§7]§6 Du kannst zwischen den Items &aBronze, Eisen und Gold &6wählen." to player
+			stop trigger
+			
+			
+			
+every 1 second:
+	loop {spawner.Bronze::*}:
+		drop 1 brick named "&7Bronze" at block over loop-value
+		
+every 5 seconds:
+	loop {spawner.Eisen::*}:
+		drop 1 iron ingot named "&7Eisen" at block over loop-value
+		
+every 10 seconds:
+	loop {spawner.Gold::*}:
+		drop 1 gold ingot named "&6Gold" at block over loop-value
+		
+#________________________________________________ECO_______________________________________________
+
+on join:
+	if {money.%player's uuid%} is not set:
+		set {money.%player's uuid%} to 1000
+		
+on first join:
+	set {money.%player's uuid%} to 1000
+
+command /money [<Text>] [<Integer>] [<player>]:	
+	aliases: /coins, /cash, /geld, /eco, /münzen
+	permission: pm.eco.money
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Dein Geld: &a%{money.%player's uuid%}%&a$" to player
+		if arg 1 is "help":
+			if player has permission "pm.eco.help":
+				send "§7[§6%{prefix}%§7]§6 Du kannst folgendes machen: add, pay, remove, set." to player
+				stop trigger
+		if arg 1 is "add":
+			if player has permission "pm.eco.add":
+				if arg 3 is not set:
+					add arg 2 to {money.%player's uuid%}
+					send "§7[§6%{prefix}%§7]§6 &a%arg 2%&a$ &6wurden hinzugefügt!" to player
+					stop trigger
+				else:
+					add arg 2 to {money.%arg 3's uuid%}
+					send "§7[§6%{prefix}%§7]§6 &a%arg 2%&a$ &6wurden &a%arg 3% &6hinzugefügt!" to player
+					stop trigger
+			else:
+				send "{@KeineRechte}" to player
+		if arg 1 is "pay":
+			send "§7[§6%{prefix}%§7]§6 Bitte benutze &a/pay&6, um zu bezahlen." to player
+			stop trigger
+		if arg 1 is "set":
+			if player has permission "pm.eco.set":
+				if arg 2 is not set:
+					send "§7[§6%{prefix}%§7]§6 Bitte gib eine Menge an." to player
+				else:
+					if arg 3 is not set:
+						set {money.%player's uuid%} to arg 2
+						send "§7[§6%{prefix}%§7]§6 Dein Kontostand wurde erfolreich auf &a%arg 2%&a$ &6gesetzt." to player
+					else:
+						if player has permission "pm.eco.set.others":
+							set {money.%arg 3's uuid%} to arg 2
+							send "§7[§6%{prefix}%§7]§6 Der Kontostand von &a%arg 3% &6wurde erfolreich auf &a%arg 2% &6gesetzt." to player
+						else:
+							send "{@KeineRechte}" to player
+			else:
+				send "{@KeineRechte}" to player
+		if arg 1 is "remove":
+			if player has permission "pm.eco.remove":
+				if arg 3 is not set:
+					if player has permission "pm.eco.remove.own":
+						remove arg 2 from {money.%player's uuid%}
+						send "§7[§6%{prefix}%§7]§6 Dir wurden &a%arg 2%&a$ &6abgezogen." to player
+						stop trigger
+					else:
+						send "{@KeineRechte}" to player
+						stop trigger
+				if arg 3 is set:
+					if player has permission "pm.eco.remove.other":
+						remove arg 2 from {money.%arg 3's uuid%}
+						send "§7[§6%{prefix}%§7]§6 Du hast &a%arg 3% &a%arg 2%&a$ &6abgezogen." to player
+						if arg 3 has permission "pm.eco.remove.notify":
+							send "§7[§6%{prefix}%§7]§6 Dir wurden &a%arg 2%&a$ &6von &a%player% &6abgezogen." to arg 3
+							stop trigger
+					else:
+						send "{@KeineRechte}" to player
+						stop trigger
+			else:
+				send "{@KeineRechte}" to player
+				stop trigger
+		
+command /pay [<player>] [<Integer>]:
+	aliases: /givemoney
+	permission: pm.eco.pay
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is set:
+			if arg 2 is set:
+				if arg 2 is more than 0:
+					if arg 2 is not more than {money.%player's uuid%}:
+						remove arg 2 from {money.%player's uuid%}
+						add arg 3 to {money.%arg 2's uuid%}
+						send "§7[§6%{prefix}%§7]§6 Du hast &a%arg 1% &a%arg 2%&a$ &6gegeben." to player
+						send "§7[§6%{prefix}%§7]§6 Du hast &a%arg 2%&a$ &6von &a%player% &6erhalten." to arg 1
+						stop trigger
+					else:
+						send "§7[§6%{prefix}%§7]§6 Du hast nicht genug Geld dafür!" to player
+						stop trigger
+			if arg 2 is not set:
+				send "§7[§6%{prefix}%§7]§6 Bitte gib eine Geldmenge an!" to player
+				stop trigger
+		else:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib einen Spieler an!" to player
+			stop trigger
+
+#________________________________________________SETLIFE_______________________________________________
+
+on first join:
+    set max health of player to 10
+ 
+on respawn: 
+    set max health of player to {Setlife.%player%}
+ 
+ 
+command /setlife [<number>]:
+    permission: pm.setlife
+    trigger:
+        if arg 1 is set:
+            if arg 1 is more than 10:
+                set max health of player to arg 1
+                set {Setlife.%player%} to arg 1
+            else:
+                set max health of player to 10
+                set {Setlife.%player%} to 10
+            set Health of player to arg 1
+            send "§7[§6%{prefix}%§7]§6 Deine Leben wurden auf &a%arg-1% &6gesetzt." to player
+        else:
+            send "§7[§6%{prefix}%§7]§6 Bitte gib eine Nummer ein!" to player
+
+#________________________________________________BANSYSTEM_______________________________________________
+
+command /ban [<offline player>] [<Text>]:
+	permission: pm.ban.ban
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib einen Spieler an." to player
+		else:
+			if arg 2 is not set:
+				set {%arg 1%.banned} to "§7[§6%{prefix}%§7]§6 Du bist gebannt."
+				send "§7[§6%{prefix}%§7]§6 Der Spieler %arg 1% wurde erfolreich gebannt." to player
+				kick arg 1 due to "§7[§6%{prefix}%§7]§6 Du wurdest gebannt."
+			if arg 2 is set:
+				set {%arg 1%.banned} to "§7[§6%{prefix}%§7]§6 Du bist wegen %arg 2% gebannt."
+				send "§7[§6%{prefix}%§7]§6 Der Spieler %arg 1% wurde erfolgreich wegen %arg 2% gebannt." to player
+				kick arg 1 due to "§7[§6%{prefix}%§7]§6 Du wurdest gebannt."
+				
+on join:
+	if {%player%.banned} is set:
+		kick player due to {%player%.banned}
+		
+command /unban [<offline player>]:
+	permission: pm.ban.unban
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib einen Spieler an." to player
+		else:
+			delete {%arg 1%.banned}
+			send "§7[§6%{prefix}%§7]§6 Der Spieler &a%arg 1% &6wurde erfolreich entbannt." to player
+
+#________________________________________________MSG_______________________________________________
+
+command /msg [<Player>] [<Text>]:
+	aliases: /tell, /say, /whisper, /message, /m
+	permission: pm.msg.msg
+	permission message: {@KeineRechte}
+	trigger:
+		if arg 1 is not set:
+			send "§7[§6%{prefix}%§7]§6 Bitte gib einen Spieler an." to player
+		else:
+			if arg 2 is not set:
+				send "§7[§6%{prefix}%§7]§6 Bitte gib eine Nachricht an." to player
+			else:
+				send "§7[§6%{prefix}%§7]§6 &aDu &7-> &a%arg 1% &7| &r%arg 2%" to player
+				send "§7[§6%{prefix}%§7]§6 &a%player% &7-> &adir &7| &r%arg 2%" to arg 1
+				set {%player%.msg} to arg 1
+				set {%arg 1%.msg} to player
+				
+on chat:
+	if {%player%.reply} is true:
+		cancel event
+		send chat message to {%player%.msg}
+		send "§7[§6%{prefix}%§7]§6 Deine Nachricht wurde erfolreich versandt." to player
+		send "§7[§6%{prefix}%§7]§6 &aDu &7-> &a%{%player%.msg}% &7| &r%chat message%" to player
+		send "§7[§6%{prefix}%§7]§6 &a%player% &7-> &adir &7| &r%chat message%" to {%player%.msg}
+		delete {%player%.reply}
+
+command /r:
+	aliases: /reply, /antwort, /replymsg
+	permission: pm.msg.reply
+	permission message: {@KeineRechte}
+	trigger:
+		send "§7[§6%{prefix}%§7]§6 Bitte gebe einen Text in den Chat ein, den du senden willst."
+		set {%player%.reply} to true
+		
+#________________________________________________MOTD_______________________________________________
+on server list ping:
+	set motd to "Test-Server"
+
+#________________________________________________TABLIST_______________________________________________
+on join:
+    set tab header to "%nl%&7----- &b&l%{prefix}% &r&7-----" and footer to "%nl%&a&lShop: &2&l%{info.shop}% %nl% &7---------- ---------- ----------" for player
+
+
+#________________________________________________COLOR-API_______________________________________________
+#Verwende {hl} und {n}
+#!Funktioniert nicht!
+#on join:
+#	if {hl} is not set:
+#		set {hl} to "§a"
+#		set {n} to "§6"
+#		loop all players:
+#			if player has permission "pm.update.notify":
+#				send "§7[§6%{prefix}%§7]§6 Achtung: Du hast keine Farben für das Plugin festgelegt. Bitte tue das mit /cmdcolor!" to loop-player
+#
+#command /cmdcolor [<Text>] [<Text>]:
+#	permission: pm.cmdcolor.set
+#	permission message:	{@KeineRechte}
+#	trigger:
+#		if arg 1 is not set:
+#			send "§7[§6%{prefix}%§7]§6 Bitte gib an, ob du die Farbe für Highlight oder Normal ändern willst." to player
+#		else:
+#			if arg 1 is "Highlight":
+#				if arg 2 is not set:
+#					send "§7[§6%{prefix}%§7]§6 Du kannst zwischen den Farben Rot, Hellgrün, Dunkelblau und Grün wählen." to player
+#				else:
+#					if arg 2 is "Rot":
+#						set {hl} to "&4"
+#					if arg 2 is "Hellgrün":
+#						set {hl} to "§a"
+#					if arg 2 is "Dunkelblau":
+#						set {hl} to "§1"
+#					if arg 2 is "Grün":
+#						set {hl} to "§2"
+#					send "§7[§6%{prefix}%§7]§6 Die Highlight-Farbe wurde erfolreich auf %{hl}%%arg 2% &6gesetzt." to player
+#					send "§7[§6%{prefix}%§7]§6 %{hl}%Dies ist ein Highlight." to player
+#_________________________________________________AKTUALISIEREN_______________________________________________
+#Dies ist die Liste der Module, die bald aktualisiert werden müssen.
+#Anticheat: Neues Ban-System implementieren
+#Anticheat: AutoArmor: Verbessern
+#MSG: Bugfixes
